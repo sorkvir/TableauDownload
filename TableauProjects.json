@@ -1,0 +1,16 @@
+{
+    "projects": [
+		{
+			"name": "<<PROJECT NAME AS IT SHOWS IN TABLEAU SERVER>>"
+        },
+        {
+            "name": "<<PROJECT NAME AS IT SHOWS IN TABLEAU SERVER>>"
+        },
+		{
+			"name": "<<PROJECT NAME AS IT SHOWS IN TABLEAU SERVER>>"
+        },
+		{
+			"name": "<<PROJECT NAME AS IT SHOWS IN TABLEAU SERVER>>"
+        }
+	]
+}
