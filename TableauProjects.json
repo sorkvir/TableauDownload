@@ -1,16 +1,10 @@
 {
     "projects": [
 		{
-			"name": "<<PROJECT NAME AS IT SHOWS IN TABLEAU SERVER>>"
-        },
-        {
-            "name": "<<PROJECT NAME AS IT SHOWS IN TABLEAU SERVER>>"
+			"name": "<<< PROJECT FOLDER NAME 1 >>>"
         },
 		{
-			"name": "<<PROJECT NAME AS IT SHOWS IN TABLEAU SERVER>>"
-        },
-		{
-			"name": "<<PROJECT NAME AS IT SHOWS IN TABLEAU SERVER>>"
+			"name": "<<< PROJECT FOLDER NAME 2 >>>"
         }
 	]
 }
