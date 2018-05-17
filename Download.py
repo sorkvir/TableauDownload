@@ -253,7 +253,7 @@ for workbook in query_workbooks(MY_USER_ID):
 	for elem in workbook.iter("*"):
 		for id in ProjectIDList:
 			if elem.tag == '{http://tableau.com/api}project' and elem.get('id') == id:
-				downloadurl = SERVER + "/api/2.2/sites/{0}/workbooks/".format(SITE_ID) +"".join(workbook.get('id')) + "/content"
+				downloadurl = SERVER + "/api/2.2/sites/{0}/workbooks/".format(SITE_ID) +"".join(workbook.get('id')) + "/content downloadurl = SERVER + "/api/2.2/sites/{0}/workbooks/".format(SITE_ID) +"".join(workbook.get('id')) + "/content?includeExtract=TRUE"
 				downloadlist.append(downloadurl)
 				print("Downloading " + workbook.get('name'))
 				for downloadurl in downloadlist:
