@@ -9,3 +9,6 @@ https://onlinehelp.tableau.com/current/api/rest_api/en-us/REST/rest_api_concepts
 
 
 An HTTP response of 500 (Internal Server Error) can mean that a header is missing or incorrect (for example, Content-Length). It can also mean that the payload for Append to File Upload does not include the two required blank lines in the first part of the payload (per the RFC specification for multi-part payloads). 
+
+
+ turned out it was an encoding problem with the .twbx (zip) file. I changed the encoding before uploading the binary data to iso-8859-1 and it started working
