@@ -12,3 +12,6 @@ An HTTP response of 500 (Internal Server Error) can mean that a header is missin
 
 
  turned out it was an encoding problem with the .twbx (zip) file. I changed the encoding before uploading the binary data to iso-8859-1 and it started working
+
+
+Automating Tableau Workbook Exports Using Python And Tabcmd Command Tool: http://bicortex.com/automating-tableau-workbook-exports-using-python-and-tabcmd-command-tool/
