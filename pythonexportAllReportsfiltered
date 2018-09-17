@@ -1,0 +1,118 @@
+# from http://bicortex.com/automating-tableau-workbook-exports-using-python-and-tabcmd-command-tool/
+
+import sqlite3
+import os
+import sys
+import argparse
+import subprocess
+import pandas as pd
+ 
+config = configparser.ConfigParser()
+config.read('params.cfg')
+ 
+#sqlite &amp; tabcmd args
+dbsqlite_location = config.get('Sqlite',os.path.normpath('dbsqlite_location'))
+dbsqlite_fileName = config.get('Sqlite','dbsqlite_fileName')
+tabcmd_location = config.get('Tableau_CMD','tableau_cmd_tool_path')
+tabcmd_url = config.get('Tableau_CMD','tableau_svr_url')
+pdfs_location = config.get('PDFs', 'save_path')
+ 
+parser = argparse.ArgumentParser(description='Tableau report(s) generation script by bicortex.com')
+ 
+#tableau server args
+parser.add_argument('-u', '--username', help='Tableau server user name', required=True)
+parser.add_argument('-p', '--passwd', help='Tableau server password', required=True)
+parser.add_argument('-o', '--option', help='Other options and arguments provided by tabcmd', required=False)
+args = parser.parse_args()
+ 
+if not args.username or not args.passwd:
+    parser.print_help()
+ 
+#tableau login function
+def tab_login(tabcmd_location, tabcmd_url, username, passwd): 
+    try:    
+        p=subprocess.run('{0} login -s {1} -u {2} -p {3} -no-certcheck'\
+        .format(os.path.join(os.path.normpath(tabcmd_location),'tabcmd'),\
+        tabcmd_url, args.username, args.passwd ),shell=True)         
+        r=p.returncode
+        return r
+    except subprocess.SubprocessError as e:
+            print(e)
+            sys.exit(1)
+ 
+#tableau logout function
+def tab_logout(tabcmd_location):
+    try:    
+        p=subprocess.run('{0} logout'.format(os.path.join(os.path.normpath(tabcmd_location),'tabcmd')),shell=True)         
+    except subprocess.SubprocessError as e:
+            print(e)
+            sys.exit(1)
+ 
+#tabcmd report export function
+def run_extracts(pdfs_location, tabcmd_location, username=args.username, passwd=args.passwd, option=args.option):
+    standard_export_options = '--pdf --pagelayout landscape --no-certcheck --timeout 500'
+    login_ok = tab_login(tabcmd_location, tabcmd_url, username, passwd)  
+    if login_ok==0:
+        with sqlite3.connect(os.path.join(dbsqlite_location, dbsqlite_fileName)) as sqlLiteConn:
+            sqliteCursor = sqlLiteConn.cursor()
+            sqliteCursor.execute( """
+                                    SELECT
+                                    w.name                     AS workbook_name,
+                                    v.name                     AS view_name,
+                                    f.name                     AS filter_name,
+                                    f.value                    AS filter_value
+                                    FROM workbook w
+                                    JOIN view v ON w.id = v.fk_workbook_id
+                                    JOIN view_filter_bridge vfb ON v.id = vfb.fk_view_id
+                                    JOIN filter f ON vfb.fk_filter_id = f.id                            
+                                    WHERE w.name = 'Sample_Tableau_Report'
+                                    AND v.sheettype = 'dashboard'
+                                    AND v.state = 'active';
+                                """)
+            result_set = sqliteCursor.fetchall()
+            if result_set:                
+                df = pd.DataFrame(result_set)
+                col_name_list = [tuple[0] for tuple in sqliteCursor.description]
+                df.columns = col_name_list
+                print('\nThe following attributes and values were returned from the SQL query:')                
+                print(df)
+                for row in result_set:
+                    workbook_name           = row[0]
+                    view_name               = row[1]
+                    filter_name             = row[2]
+                    filter_value            = row[3]
+ 
+                    if filter_name:
+                        if ' ' in row[2]==True:
+                            filter_name = row[2].replace(' ', '%20')
+                        if ' ' in row[2]==True:
+                            filter_value = row[2].replace(' ', '%20')  
+                        if not option:
+                            option_value = standard_export_options
+                            command = '{0} export "{1}?{2}={3}" -f "{4}{5}.pdf" {6} '\
+                            .format(os.path.join(os.path.normpath(tabcmd_location),'tabcmd'),\
+                            workbook_name + '/' + view_name, filter_name, filter_value, pdfs_location, filter_value, option_value)     
+                            try:    
+                                p=subprocess.run(command, shell=True)                                 
+                            except subprocess.SubprocessError as e:
+                                print(e)
+                                sys.exit(1)                                        
+                    else:  
+                        if not option:
+                            option_value = standard_export_options
+                            command = '{0} export "{1}" -f "{2}{3}.pdf" {4} '\
+                            .format(os.path.join(os.path.normpath(tabcmd_location),'tabcmd'),\
+                            workbook_name + '/' + view_name, pdfs_location, view_name, option_value)     
+                            try:    
+                                p=subprocess.run(command, shell=True)                                 
+                            except subprocess.SubprocessError as e:
+                                print(e)
+                                sys.exit(1)
+        tab_logout(tabcmd_location)
+ 
+if __name__ == "__main__":  
+    if ' ' in tabcmd_location:
+        tabcmd_location = '"'+ os.path.normpath(tabcmd_location) + '"'
+    else:
+        tabcmd_location = os.path.normpath(tabcmd_location)    
+    run_extracts(pdfs_location, tabcmd_location, args.username, args.passwd)         
