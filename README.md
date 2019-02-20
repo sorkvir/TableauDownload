@@ -15,3 +15,6 @@ An HTTP response of 500 (Internal Server Error) can mean that a header is missin
 
 
 Automating Tableau Workbook Exports Using Python And Tabcmd Command Tool: http://bicortex.com/automating-tableau-workbook-exports-using-python-and-tabcmd-command-tool/
+
+
+Excel manipulation included
