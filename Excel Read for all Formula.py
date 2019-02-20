@@ -1,15 +1,20 @@
 from openpyxl import load_workbook
 wb = load_workbook(filename = 'am.xlsx')
-for ws in wb.worksheets:
-    for row in ws.iter_rows(min_row=1, max_col=3, max_row=2):
-            for cell in row:
-               print(getattr(cell, 'value', None))
-
 ws=wb['Dashboard']
-ws=wb.active
+#for row in ws.values: # will throw merged cell ERROR, use getattr(item, 'value', None) to tell
+#       print(row) 
+
+# address: cell.row, cell.column
+for ws in wb.worksheets:
+    for row in ws.iter_rows(min_row=1, max_col=40, max_row=200):#
+            for cell in row:
+               result=getattr(cell, 'value', None)
+               if result is not None and str(result)[:1]=="=":
+                print(result,cell.row,cell.column)
+'''
 for ws in wb.worksheets:
     print(ws)
-'''
+
     #print(ws['B2'].value)
     for row in ws.values: # will throw merged cell ERROR, use getattr(item, 'value', None) to tell
        print(row) 
