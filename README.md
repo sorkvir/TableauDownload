@@ -18,3 +18,13 @@ Automating Tableau Workbook Exports Using Python And Tabcmd Command Tool: http:/
 
 
 Excel manipulation included
+
+
+Power BI tricks:
+
+
+HOW TO SOLVE if your Power BI table has multi dates, and you want a slice of only Latest date, because you can't filter using date=max(datecolumn)
+" A fUNCTION 'MAX' has been used in a true/false exprssion that is used as a table filter expression. This is not allowed. "
+
+
+use a flag first, SameMonth_Flag = if(month(Table_daily[DateUTC])=month(Omniture_day[Maxdate]),"Y","N")
